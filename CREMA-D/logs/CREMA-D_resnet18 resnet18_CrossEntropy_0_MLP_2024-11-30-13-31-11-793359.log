@@ -1,0 +1,40 @@
+2024-11-30 13:31:11,793 ---------------------Cfg is set as follow--------------------
+2024-11-30 13:31:11,793 {'dataset': {'dataset_name': 'CREMA-D', 'data_root': '/data/php_code/data_processing/CREMA', 'open_root': ''}, 'visual': {'name': 'resnet18', 'freeze': False, 'pretrain': False, 'hidden_dim': 512}, 'text': {'name': 'resnet18'}, 'loss': {'type': 'CrossEntropy'}, 'neck': {'type': 'Concat'}, 'head': {'type': 'MLP', 'hidden_dims_lst': [256, 256, 256], 'bias': True}, 'network': {'pretrained': False, 'pretrained_model': ''}, 'train': {'epoch_dict': 200, 'batch_size': 64, 'div': 1, 'distribution': 'gaussian', 'disturb': 'backbone', 'max_epoch': 50, 'cifar_imb_ratio': 0.1, 'distributed': False, 'stage': 30, 'random_times': 1, 'direct_ave': False, 'num_workers': 8, 'shuffle': True, 'local_rank': 0, 'sampler': 'IS', 'optimizer': {'type': 'SGD', 'lr': 0.0001, 'lr_cls': 0.1, 'lr_hyper': 0.1, 'momentum': 0.9, 'wc': 0.0001}, 'lr_scheduler': {'type': 'warmup', 'lr_step': [160, 180], 'lr_factor': 0.1, 'warmup_epoch': 2, 'cosine_decay_end': 0, 'patience': 70}, 'two_stage': {'drw': False, 'drs': False, 'start_epoch': 1}, 'tensorboard': {'enable': True}, 'mixup_alpha': 1.0, 'flat_ratio': 0.3, 'noise_ratio': 1e-10, 'noise_ratio_cls': 1e-10, 'temperature1': 0.4}, 'test': {'batch_size': 64, 'exp_id': '', 'resume_head': '', 'num_workers': 8, 'error': 0.1, 'lamda': 1000}, 'setting': {'type': 'CREMA Classification', 'num_class': 6, 'num_layers': 10}, 'eval_mode': False, 'output_dir': '', 'save_dir': '', 'seed': 0, 'use_gpu': True, 'gpu_id': '5', 'resume_model': '', 'resume_mode': 'all', 'valid_step': 5, 'pin_memory': True, 'save_fre': 10, 'print_inteval': 500, 'debug': False, 'variance': 0.0001, 'image_res': 224, 'fps': 1}
+2024-11-30 13:31:11,793 -------------------------------------------------------------
+2024-11-30 13:31:12,865 Epoch 0 is pending...
+2024-11-30 13:31:51,483 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:31:51,484 Epoch 0: Average Training Loss:2.142
+2024-11-30 13:31:55,735 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:31:55,736 Epoch 0: f1:0.8259,acc:0.8212,mAP:0.8762,f1_a:0.6865,acc_a:0.6828,mAP_a:0.7444,f1_v:0.6481,acc_v:0.6519,mAP_v:0.7473
+2024-11-30 13:31:55,736 Find a better model and save it!
+2024-11-30 13:31:56,384 Epoch 1 is pending...
+2024-11-30 13:32:32,197 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:32:32,198 Epoch 1: Average Training Loss:2.117
+2024-11-30 13:32:36,421 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:32:36,421 Epoch 1: f1:0.8151,acc:0.8105,mAP:0.8742,f1_a:0.6852,acc_a:0.6828,mAP_a:0.7445,f1_v:0.6518,acc_v:0.6546,mAP_v:0.7477
+2024-11-30 13:32:36,422 Epoch 2 is pending...
+2024-11-30 13:33:12,828 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:33:12,828 Epoch 2: Average Training Loss:2.097
+2024-11-30 13:33:17,034 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:33:17,034 Epoch 2: f1:0.8234,acc:0.8185,mAP:0.8759,f1_a:0.6850,acc_a:0.6815,mAP_a:0.7432,f1_v:0.6460,acc_v:0.6478,mAP_v:0.7468
+2024-11-30 13:33:17,035 Epoch 3 is pending...
+2024-11-30 13:33:52,981 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:33:52,981 Epoch 3: Average Training Loss:2.080
+2024-11-30 13:33:57,103 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:33:57,103 Epoch 3: f1:0.8169,acc:0.8118,mAP:0.8743,f1_a:0.6841,acc_a:0.6815,mAP_a:0.7436,f1_v:0.6459,acc_v:0.6465,mAP_v:0.7468
+2024-11-30 13:33:57,103 Epoch 4 is pending...
+2024-11-30 13:34:33,074 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:34:33,074 Epoch 4: Average Training Loss:2.065
+2024-11-30 13:34:37,559 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:34:37,559 Epoch 4: f1:0.8180,acc:0.8132,mAP:0.8753,f1_a:0.6866,acc_a:0.6841,mAP_a:0.7444,f1_v:0.6439,acc_v:0.6452,mAP_v:0.7470
+2024-11-30 13:34:37,559 Epoch 5 is pending...
+2024-11-30 13:35:13,280 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:35:13,280 Epoch 5: Average Training Loss:2.051
+2024-11-30 13:35:17,407 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:35:17,407 Epoch 5: f1:0.8240,acc:0.8199,mAP:0.8764,f1_a:0.6852,acc_a:0.6828,mAP_a:0.7437,f1_v:0.6445,acc_v:0.6465,mAP_v:0.7470
+2024-11-30 13:35:17,408 Epoch 6 is pending...
+2024-11-30 13:35:53,186 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:35:53,186 Epoch 6: Average Training Loss:2.038
+2024-11-30 13:35:57,493 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-11-30 13:35:57,493 Epoch 6: f1:0.8171,acc:0.8132,mAP:0.8774,f1_a:0.6863,acc_a:0.6841,mAP_a:0.7434,f1_v:0.6504,acc_v:0.6532,mAP_v:0.7452
+2024-11-30 13:35:57,494 Epoch 7 is pending...
