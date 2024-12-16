@@ -20,7 +20,8 @@ The original datasets can be found:
 ### Run
 The code use CREMA-D dataset as example. You can simply run the code using:  
 <pre><code>
-python Crema_ours.py
+python Crema_batch.py / Crema_epoch.py
 </code></pre>
+
 
 For replication inquiries or issues, feel free to contact us via email at [wfq011207@163.com].
