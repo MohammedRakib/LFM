@@ -5,6 +5,7 @@ Here is the official PyTorch implementation of ''*Facilitating Multimodal Classi
 
 **Paper Title: "Facilitating Multimodal Classification via Dynamically Learning Modality Gap"**
 
+For replication inquiries or issues, feel free to contact us via email at [wfq011207@163.com] or [fqwan@njust.edu.cn].
 
 
 
@@ -24,4 +25,3 @@ python Crema_batch.py / Crema_epoch.py
 </code></pre>
 
 
-For replication inquiries or issues, feel free to contact us via email at [wfq011207@163.com].
