@@ -37,30 +37,6 @@ def compute_mAP(outputs, labels):
     return np.mean(AP)
 
 
-def Alignment(a_f, v_f):
-    a_f = F.normalize(a_f, p=2, dim=-1)
-    v_f = F.normalize(v_f, p=2, dim=-1)
-    similarity_matrix = torch.matmul(a_f, v_f.T) 
-        
-    similarity_matrix = similarity_matrix / 0.07
-    
-    labels = torch.arange(a_f.size(0)).to(a_f.device)
-    loss_a_to_v = F.cross_entropy(similarity_matrix, labels)
-    loss_v_to_a = F.cross_entropy(similarity_matrix.T, labels)
-    loss = (loss_a_to_v + loss_v_to_a) / 2.0
-    return loss
-
-def Alignment(p, q):
-    p = F.softmax(p, dim=-1)
-    q = F.softmax(q, dim=-1)
-    similarity_matrix_qp = torch.matmul(q, p.T)
-    similarity_matrix_pq = torch.matmul(p, q.T)
-    labels = torch.arange(p.size(0)).long().cuda()
-    loss_qp = F.cross_entropy(similarity_matrix_qp, labels)
-    loss_pq =  F.cross_entropy(similarity_matrix_pq, labels)
-    loss = 0.1 * loss_qp + 0.2 * loss_pq
-    return loss
-
 def Alignment(p, q):
     p = F.softmax(p, dim=-1)
     q = F.softmax(q, dim=-1)
