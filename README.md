@@ -21,7 +21,7 @@ The original datasets can be found:
 ### Run
 The code use CREMA-D dataset as example. You can simply run the code using:  
 <pre><code>
-python Crema_batch.py / Crema_epoch.py
+python Crema_epoch.py
 </code></pre>
 
 
