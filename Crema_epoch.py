@@ -57,8 +57,8 @@ def getAlpha_grad(loss_alignment, loss_cls):
         (grads_cls[name] * grads_alignment[name]).sum().item()
         for name in grads_cls.keys() & grads_alignment.keys()
     )
-    cls_k = [0.5, 0.5]
-    if this_cos >= 0: 
+    cls_k = [1.0, 1.0]
+    if this_cos <= 0: 
         cls_k, _ = MinNormSolver.find_min_norm_element(
             [list(grads_cls.values()), list(grads_alignment.values())]
         )
@@ -76,7 +76,6 @@ def getAlpha(train_loader, model, optimizer):
         o_b, o_a, o_v, a_f, v_f = model(spectrogram, image)
         loss_alignment = Alignment(o_a, o_v)
         loss_cls = criterion( 0.5 * o_v+  0.5 *o_a, y).mean()
-        break
 
     loss_cls.backward(retain_graph=True)
     grads_cls = {name: param.grad.clone() for name, param in model.named_parameters() if param.grad is not None}
@@ -88,8 +87,8 @@ def getAlpha(train_loader, model, optimizer):
         (grads_cls[name] * grads_alignment[name]).sum().item()
         for name in grads_cls.keys() & grads_alignment.keys()
     )
-    cls_k = [0.5, 0.5]
-    if this_cos >= 0: 
+    cls_k = [1.0, 1.0]
+    if this_cos <= 0: 
         cls_k, _ = MinNormSolver.find_min_norm_element(
             [list(grads_cls.values()), list(grads_alignment.values())]
         )
