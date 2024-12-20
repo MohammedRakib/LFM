@@ -47,8 +47,8 @@ def Alignment(p, q):
     return js_score
 
 def getAlpha(train_loader, model, optimizer):
+    cls_k = [0.5, 0.5]
     criterion = nn.CrossEntropyLoss(reduction='none').cuda()
-    
     for step, (spectrogram, image, y) in enumerate(train_loader):
         image = image.float().cuda()
         y = y.cuda()
@@ -69,12 +69,12 @@ def getAlpha(train_loader, model, optimizer):
         (grads_cls[name] * grads_alignment[name]).sum().item()
         for name in grads_cls.keys() & grads_alignment.keys()
     )
-    cls_k = [0.5, 0.5]
     if this_cos >= 0: 
-        cls_k, _ = MinNormSolver.find_min_norm_element(
+        cls_k_, _ = MinNormSolver.find_min_norm_element(
             [list(grads_cls.values()), list(grads_alignment.values())]
         )
-    return 2 * cls_k
+    return [2 * value for value in cls_k]
+
 
 def train_audio_video(epoch, train_loader, model, optimizer, logger, cls_k):
     model.train()
