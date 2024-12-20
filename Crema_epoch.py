@@ -70,7 +70,7 @@ def getAlpha(batch, model):
         cls_k_, _ = MinNormSolver.find_min_norm_element(
             [list(grads_cls.values()), list(grads_alignment.values())]
         )
-    return [2 * value for value in cls_k]
+    return cls_k
 
 def train_audio_video(epoch, train_loader, model, optimizer, logger, cls_k):
     model.train()
@@ -87,7 +87,7 @@ def train_audio_video(epoch, train_loader, model, optimizer, logger, cls_k):
         o_b, o_a, o_v, a_f, v_f = model(spectrogram, image)
         loss_alignment = Alignment(o_a, o_v)
         loss_cls = criterion( 0.5 * o_v+  0.5 *o_a, y).mean()
-        loss =   cls_k[0] * loss_cls + cls_k[1] * loss_alignment
+        loss =   2 * (cls_k[0] * loss_cls + cls_k[1] * loss_alignment)
         loss.backward()
         optimizer.step()
         tl.add(loss.item())
