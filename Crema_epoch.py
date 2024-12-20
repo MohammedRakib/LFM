@@ -46,25 +46,22 @@ def Alignment(p, q):
     js_score = 0.5 * (kl_p_m + kl_q_m)
     return js_score
 
-def getAlpha(train_loader, model, optimizer):
+
+def getAlpha(batch, model):
     cls_k = [0.5, 0.5]
     criterion = nn.CrossEntropyLoss(reduction='none').cuda()
-    for step, (spectrogram, image, y) in enumerate(train_loader):
-        image = image.float().cuda()
-        y = y.cuda()
-        spectrogram = spectrogram.unsqueeze(1).float().cuda()
-        optimizer.zero_grad()
-        o_b, o_a, o_v, a_f, v_f = model(spectrogram, image)
-        loss_alignment = Alignment(o_a, o_v)
-        loss_cls = criterion( 0.5 * o_v+  0.5 *o_a, y).mean()
-        break
+    spectrogram, image, y = batch
+    image = image.float().cuda()
+    y = y.cuda()
+    spectrogram = spectrogram.unsqueeze(1).float().cuda()
+    o_b, o_a, o_v, a_f, v_f = model(spectrogram, image)
+    loss_alignment = Alignment(o_a, o_v)
+    loss_cls = criterion( 0.5 * o_v+  0.5 *o_a, y).mean()
 
     loss_cls.backward(retain_graph=True)
     grads_cls = {name: param.grad.clone() for name, param in model.named_parameters() if param.grad is not None}
-    optimizer.zero_grad()
-    loss_alignment.backward(retain_graph=True)
+    loss_alignment.backward()
     grads_alignment = {name: param.grad.clone() for name, param in model.named_parameters() if param.grad is not None}
-    optimizer.zero_grad()
     this_cos = sum(
         (grads_cls[name] * grads_alignment[name]).sum().item()
         for name in grads_cls.keys() & grads_alignment.keys()
@@ -74,7 +71,6 @@ def getAlpha(train_loader, model, optimizer):
             [list(grads_cls.values()), list(grads_alignment.values())]
         )
     return [2 * value for value in cls_k]
-
 
 def train_audio_video(epoch, train_loader, model, optimizer, logger, cls_k):
     model.train()
@@ -87,27 +83,21 @@ def train_audio_video(epoch, train_loader, model, optimizer, logger, cls_k):
         image = image.float().cuda()
         y = y.cuda()
         spectrogram = spectrogram.unsqueeze(1).float().cuda()
-
         optimizer.zero_grad()
-
         o_b, o_a, o_v, a_f, v_f = model(spectrogram, image)
-
         loss_alignment = Alignment(o_a, o_v)
         loss_cls = criterion( 0.5 * o_v+  0.5 *o_a, y).mean()
-        loss = cls_k[0] *  loss_cls +  cls_k[1] * loss_alignment
+        loss =   cls_k[0] * loss_cls + cls_k[1] * loss_alignment
         loss.backward()
         optimizer.step()
-
         tl.add(loss.item())
         tl_align.add(loss_alignment.item())
         tl_fusion.add(loss_cls.item())
 
 
     loss_ave = tl.item()
-
     loss_align_all = tl_align.item()
     loss_fusion_all = tl_fusion.item()
-
     logger.info('+++++++++++++++++++++++++++++++++++++++++++++++++++++++')
     logger.info(('Epoch {epoch:d}: Average Training Loss:{loss_ave:.3f} , Average AlignLoss : {loss_align_all:.3f},Average FusionLoss : {loss_fusion_all:.3f}').format(epoch=epoch, loss_ave=loss_ave, loss_align_all = loss_align_all, loss_fusion_all =loss_fusion_all))
 
@@ -193,7 +183,7 @@ if __name__ == '__main__':
     local_rank = cfg['train']['local_rank']
     logger, log_file, exp_id = create_logger(cfg, local_rank)
 
-    # ----- SET DATALOADER -----
+    # ----- SET DATALOADER -----                          
     train_dataset = CramedDataset(config, mode='train')
     test_dataset = CramedDataset(config, mode='test')
 
@@ -203,7 +193,7 @@ if __name__ == '__main__':
     test_loader = DataLoader(dataset=test_dataset, batch_size=cfg['test']['batch_size'], shuffle=False,
                              num_workers=cfg['test']['num_workers'], pin_memory=True)
 
-                            
+    val_batch = next(iter(train_loader))
     # ----- MODEL -----
     model = AVClassifier(config=cfg)
     model = model.cuda()
@@ -218,21 +208,11 @@ if __name__ == '__main__':
 
     scheduler = optim.lr_scheduler.StepLR(optimizer, config['train']['lr_scheduler']['patience'], 0.1)
     best_acc = 0
-
-
-
+    cls_k = []
     for epoch in range(cfg['train']['epoch_dict']):
         logger.info(('Epoch {epoch:d} is pending...').format(epoch=epoch))
-
-
-        cls_k = []
-
-        cls_k = getAlpha(train_loader, model, optimizer)
-
+        cls_k = getAlpha(val_batch, model)
         scheduler.step()
         model = train_audio_video(epoch, train_loader, model, optimizer, logger, cls_k)
-
         acc, v_a, v_v = val(epoch, test_loader, model, logger)
-
-
         torch.save(model.state_dict(), f'/data/wfq/LFM/modelWeight/dynamic/Crema_{epoch}_best_model.pth')
