@@ -58,7 +58,7 @@ def getAlpha_grad(loss_alignment, loss_cls):
         for name in grads_cls.keys() & grads_alignment.keys()
     )
     cls_k = [1.0, 1.0]
-    if this_cos <= 0: 
+    if this_cos >= 0: 
         cls_k, _ = MinNormSolver.find_min_norm_element(
             [list(grads_cls.values()), list(grads_alignment.values())]
         )
