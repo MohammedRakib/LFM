@@ -66,7 +66,7 @@ def getAlpha(batch, model):
         (grads_cls[name] * grads_alignment[name]).sum().item()
         for name in grads_cls.keys() & grads_alignment.keys()
     )
-    if this_cos >= 0: 
+    if this_cos <= 0: 
         cls_k_, _ = MinNormSolver.find_min_norm_element(
             [list(grads_cls.values()), list(grads_alignment.values())]
         )
