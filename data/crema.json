@@ -24,7 +24,7 @@
         "optimizer": {
             "type": "SGD", 
             "momentum": 0.9,
-            "lr":1e-3,
+            "lr":1e-2,
             "wc" : 1.0e-4
         },
         "lr_scheduler":{
