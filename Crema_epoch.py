@@ -46,6 +46,13 @@ def Alignment(p, q):
     js_score = 0.5 * (kl_p_m + kl_q_m)
     return js_score
 
+def getAlpha_Learnable_Fitted(epoch):
+    # Alpha with Learnable learning is fitted with functions
+    coef_alpha1 = [2.04623704e-01, 3.35472727e-03, 1.22989557e-04, -2.92947416e-06, 2.23835486e-08, -5.39717505e-11]
+    coef_alpha2 = [7.95376296e-01, -3.35472727e-03, -1.22989557e-04, 2.92947416e-06, -2.23835486e-08, 5.39717505e-11]
+    alpha1 = sum(c * (epoch ** i) for i, c in enumerate(coef_alpha1))
+    alpha2 = sum(c * (epoch ** i) for i, c in enumerate(coef_alpha2))
+    return [alpha1, alpha2]
 
 def getAlpha(batch, model):
     cls_k = [0.5, 0.5]
