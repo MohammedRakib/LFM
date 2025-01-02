@@ -19,9 +19,7 @@ from sklearn.metrics import f1_score, average_precision_score
 from data.template import config
 from dataset.CREMA import CramedDataset
 from model.AudioVideo import AVClassifier
-from utils.stocBiO import *
 from geomloss import SamplesLoss
-from utils.min_norm_solvers import MinNormSolver
 from utils.utils import (
     create_logger,
     Averager,
@@ -54,30 +52,6 @@ def getAlpha_Learnable_Fitted(epoch):
     alpha2 = sum(c * (epoch ** i) for i, c in enumerate(coef_alpha2))
     return [alpha1, alpha2]
 
-def getAlpha(batch, model):
-    cls_k = [0.5, 0.5]
-    criterion = nn.CrossEntropyLoss(reduction='none').cuda()
-    spectrogram, image, y = batch
-    image = image.float().cuda()
-    y = y.cuda()
-    spectrogram = spectrogram.unsqueeze(1).float().cuda()
-    o_b, o_a, o_v, a_f, v_f = model(spectrogram, image)
-    loss_alignment = Alignment(o_a, o_v)
-    loss_cls = criterion( 0.5 * o_v+  0.5 *o_a, y).mean()
-
-    loss_cls.backward(retain_graph=True)
-    grads_cls = {name: param.grad.clone() for name, param in model.named_parameters() if param.grad is not None}
-    loss_alignment.backward()
-    grads_alignment = {name: param.grad.clone() for name, param in model.named_parameters() if param.grad is not None}
-    this_cos = sum(
-        (grads_cls[name] * grads_alignment[name]).sum().item()
-        for name in grads_cls.keys() & grads_alignment.keys()
-    )
-    if this_cos <= 0: 
-        cls_k, _ = MinNormSolver.find_min_norm_element(
-            [list(grads_cls.values()), list(grads_alignment.values())]
-        )
-    return cls_k
 
 def train_audio_video(epoch, train_loader, model, optimizer, logger, cls_k):
     model.train()
@@ -218,7 +192,7 @@ if __name__ == '__main__':
     cls_k = []
     for epoch in range(cfg['train']['epoch_dict']):
         logger.info(('Epoch {epoch:d} is pending...').format(epoch=epoch))
-        cls_k = getAlpha(val_batch, model)
+        cls_k = getAlpha_Learnable_Fitted(epoch)
         scheduler.step()
         model = train_audio_video(epoch, train_loader, model, optimizer, logger, cls_k)
         acc, v_a, v_v = val(epoch, test_loader, model, logger)
