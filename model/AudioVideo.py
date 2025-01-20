@@ -53,7 +53,7 @@ class AVClassifier(nn.Module):
 
         self.cls_a = nn.Linear(self.hidden_dim, config['setting']['num_class'])
         self.cls_v = nn.Linear(self.hidden_dim, config['setting']['num_class'])
-        self.cls_b = nn.Linear(self.hidden_dim * 2 , config['setting']['num_class'])
+        # self.cls_b = nn.Linear(self.hidden_dim * 2 , config['setting']['num_class'])
 
     def forward(self, audio, video):
         a_feature = self.audio_encoder(audio)
@@ -61,7 +61,8 @@ class AVClassifier(nn.Module):
 
         result_a = self.cls_a(a_feature)
         result_v = self.cls_v(v_feature)
-        result_b = self.cls_b(torch.cat((a_feature, v_feature), dim=1))
+        # result_b = self.cls_b(torch.cat((a_feature, v_feature), dim=1))
+        result_b = result_v + result_a
 
         return result_b, result_a, result_v, a_feature, v_feature
     
