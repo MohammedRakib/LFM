@@ -66,8 +66,10 @@ def getAlpha_Learnable(epoch, valbatch, model, alpha, lr_alpha=1e-4):
     spectrogram = spectrogram.unsqueeze(1).float().cuda()
     
     o_b, o_a, o_v, a_f, v_f = model(spectrogram, image)
+    
     loss_alignment = Alignment(o_a, o_v)
     loss_cls = criterion(0.5 * o_v + 0.5 * o_a, y).mean()
+
     L_total = alpha[0] * loss_cls + alpha[1] * loss_alignment
     theta_grads = torch.autograd.grad(L_total, model.parameters(), create_graph=True)
 
@@ -86,12 +88,14 @@ def getAlpha_Learnable(epoch, valbatch, model, alpha, lr_alpha=1e-4):
         print(alpha_grad)
         
         if epoch % 10 == 0 and epoch != 0:
-            lr_alpha = lr_alpha / 20 
+            lr_alpha = lr_alpha / 5 
         alpha[1] -= lr_alpha * alpha_grad
         alpha[1] = max(0.05, min(0.95, alpha[1])) 
         alpha[0] = 1.0 - alpha[1] 
 
-    return alpha
+
+    return alpha, lr_alpha
+
 
 
 def train_audio_video(epoch, train_loader, model, optimizer, logger, cls_k):
@@ -238,14 +242,16 @@ if __name__ == '__main__':
     optimizer = optim.SGD(model.parameters(), lr=lr_adjust,
                           momentum=config['train']['optimizer']['momentum'],
                           weight_decay=config['train']['optimizer']['wc'])
+    
+    lr_alpha = 1e-4
 
     scheduler = optim.lr_scheduler.StepLR(optimizer, config['train']['lr_scheduler']['patience'], 0.1)
     best_acc = 0
-    cls_k = [0.02, 0.98]
+    cls_k = [0.05, 0.95]
     for epoch in range(cfg['train']['epoch_dict']):
         logger.info(('Epoch {epoch:d} is pending...').format(epoch=epoch))
         # cls_k = getAlpha_Learnable_Fitted(epoch)
-        cls_k = getAlpha_Learnable(epoch, val_batch, model, cls_k)
+        cls_k, lr_alpha = getAlpha_Learnable(epoch, val_batch, model, cls_k, lr_alpha)
         scheduler.step()
         model = train_audio_video(epoch, train_loader, model, optimizer, logger, cls_k)
         acc, v_a, v_v = val(epoch, test_loader, model, logger)
