@@ -52,38 +52,46 @@ def getAlpha_Learnable_Fitted(epoch):
     return [alpha1, alpha2]
 
 
-def getAlpha_Learnable(epoch, valbatch, model, alpha, lr_alpha=1e-7):
+def getAlpha_Learnable(epoch, valbatch, model, alpha, lr_alpha=1e-4):
     criterion = nn.CrossEntropyLoss(reduction='none').cuda()
+    
     spectrogram, image, y = valbatch
     half_size = spectrogram.size(0) // 2 
     spectrogram = spectrogram[:half_size]
     image = image[:half_size]
     y = y[:half_size]
+
     image = image.float().cuda()
     y = y.cuda()
     spectrogram = spectrogram.unsqueeze(1).float().cuda()
+    
     o_b, o_a, o_v, a_f, v_f = model(spectrogram, image)
     loss_alignment = Alignment(o_a, o_v)
     loss_cls = criterion(0.5 * o_v + 0.5 * o_a, y).mean()
     L_total = alpha[0] * loss_cls + alpha[1] * loss_alignment
     theta_grads = torch.autograd.grad(L_total, model.parameters(), create_graph=True)
+
     cls_grads = torch.autograd.grad(loss_cls, model.parameters(), retain_graph=True, create_graph=True)
+
+
     hessian_vector_prod = torch.autograd.grad(
         outputs=theta_grads,
         inputs=model.parameters(),
         grad_outputs=cls_grads,
         retain_graph=True
     )
+
     with torch.no_grad():
-        alpha_grad = hessian_vector_prod[0].sum().item()
-        if epoch % 5 == 0 and epoch != 0:
-            lr_alpha = lr_alpha / 10 
+        alpha_grad = hessian_vector_prod[0].mean().item()
+        print(alpha_grad)
+        
+        if epoch % 10 == 0 and epoch != 0:
+            lr_alpha = lr_alpha / 20 
         alpha[1] -= lr_alpha * alpha_grad
-        alpha[1] = max(0.1, min(0.9, alpha[1])) 
+        alpha[1] = max(0.05, min(0.95, alpha[1])) 
         alpha[0] = 1.0 - alpha[1] 
 
     return alpha
-
 
 
 def train_audio_video(epoch, train_loader, model, optimizer, logger, cls_k):
