@@ -87,8 +87,8 @@ def getAlpha_Learnable(epoch, valbatch, model, alpha, lr_alpha=1e-4):
         alpha_grad = hessian_vector_prod[0].mean().item()
         print(alpha_grad)
         
-        if epoch % 10 == 0 and epoch != 0:
-            lr_alpha = lr_alpha / 5 
+        if epoch % 20 == 0 and epoch != 0:
+            lr_alpha = lr_alpha / 2 
         alpha[1] -= lr_alpha * alpha_grad
         alpha[1] = max(0.05, min(0.95, alpha[1])) 
         alpha[0] = 1.0 - alpha[1] 
