@@ -28,8 +28,8 @@ class VideoEncoder(nn.Module):
     def __init__(self, config=None, fps=1, mask_model=1):
         super(VideoEncoder, self).__init__()
         self.mask_model = mask_model
-        if config['visual']["name"] == 'resnet18':
-            self.video_net = resnet18(modality='visual')
+        if config['visual']["name"] == 'resnet18' and config['dataset']['dataset_name'] == 'AVMNIST':
+            self.video_net = resnet18(modality='image')
         self.fps = fps
 
     def forward(self, video, step=0, balance=0, s=400, v_bias=0):

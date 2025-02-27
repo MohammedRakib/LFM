@@ -2,6 +2,7 @@ from statistics import variance
 import torch
 import torch.nn.functional as F
 
+
 config=dict(
     dataset=dict(
         dataset_name='Places', # choose from ['Places', 'ImageNet', 'iNat2018', 'CIFAR']
